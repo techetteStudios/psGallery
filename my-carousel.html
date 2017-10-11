@@ -1,0 +1,144 @@
+
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+<link rel="import" href="picture-frame.html">
+
+<dom-module id="my-carousel">
+  <template>
+    <style>
+      button {
+        position: absolute;
+        top: calc(50% - 20px);
+        padding: 0;
+        line-height: 40px;
+        border: none;
+        background: none;
+        color: #DDD;
+        font-size: 40px;
+        font-weight: bold;
+        opacity: 0.7;
+      }
+
+      button:hover,
+      button:focus {
+        opacity: 1;
+      }
+
+      #prevBtn {
+        left: 12px;
+      }
+
+      #nextBtn {
+        right: 12px;
+      }
+
+      button[disabled] {
+        opacity: 0.4;
+      }
+    </style>
+
+    <div>
+      <slot></slot>
+    </div>
+
+    <button id="prevBtn" on-click="previous">&#x276E;</button>
+    <button id="nextBtn" on-click="next">&#x276F;</button>
+
+  </template>
+
+  <script>
+    // Extend Polymer.Element with MyMixin
+    class MyCarousel extends Polymer.Element {
+
+      static get is() { return 'my-carousel' }
+      static get properties() {
+        return {
+          jsonObjectArr: Object,
+          selectedPage: Number,
+          highestImageNumber: Number,
+          highestPageNumber: Number,
+          imageArr: Object
+        };
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this._readJSON();
+      }
+
+      initialization(){
+        //console.log("INIT");
+        this.selectedPage = 0;
+        this.imageArr = this.jsonObjectArr.rows;
+        this.highestImageNumber = this.imageArr.length;
+        this.highestPageNumber = Math.floor(this.highestImageNumber/4);
+        //console.log(this.jsonObjectArr);
+        //console.log(this.highestPageNumber);
+        this._setImages();
+      }
+
+      _readJSON(){
+        //console.log("READ");
+        //Parsing JSON
+        var xmlhttp = new XMLHttpRequest();
+        var self = this;
+        xmlhttp.open("GET", "http://gsx2json.com/api?id=1wZa0Gx2yAFDyMVayzRn428SDXCOJHOL-0_IX9uLiWW0", true);
+        xmlhttp.onreadystatechange = function() {
+          if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+              self.jsonObjectArr = JSON.parse(xmlhttp.responseText);
+              self.initialization();
+          }
+        };
+        xmlhttp.send();
+      }
+
+
+      _resetButtons(){
+        //console.log("SELECTED_PAGE:"+this.selectedPage);
+        this.$.prevBtn.disabled = (this.selectedPage==0);
+        this.$.nextBtn.disabled = (this.selectedPage==4);
+      }
+
+      _resetImages(){
+        var elem= this.firstElementChild;
+        while(elem){
+          elem.style.display = "none";
+          //console.log("CLEARED "+elem.id);
+          elem = elem.nextElementSibling;
+        }
+      }
+
+      _setImages(){
+        //console.log("SETTING IMAGES");
+        this._resetImages();
+        var index = (this.selectedPage*4)-1;
+        var elem= this.firstElementChild;
+        while(elem && index<this.highestImageNumber-1){
+          index++;
+          //console.log(index, elem);
+          elem.style.display = "block";
+          elem.setObject(this.imageArr[index]);
+          elem = elem.nextElementSibling;
+        }
+        this._resetButtons();
+      }
+
+      previous() {
+        //console.log("PREVIOUS");
+        if(this.selectedPage>0){
+          this.selectedPage--;
+        }
+        this._setImages();
+      }
+
+      next() {
+        if(this.selectedPage<5){
+          this.selectedPage++;
+        }
+        this._setImages();
+      }
+    }
+    // Register custom element definition using standard platform API
+    customElements.define(MyCarousel.is, MyCarousel);
+
+  </script>
+</dom-module>

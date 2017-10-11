@@ -1,0 +1,99 @@
+<link rel="import" href="bower_components/polymer/polymer-element.html">
+
+<dom-module id="picture-frame">
+
+  <template>
+    <!-- scoped CSS for this element -->
+    <style>
+      div.gallery {
+        width: 100%;
+        height: 50vh;
+        border: 1px solid #ccc;
+        padding: 1px;
+        overflow: hidden;
+        background-color: #ccc
+        background: blue; /* For browsers that do not support gradients */
+        background: -webkit-linear-gradient(#C2DFFF, white); /* For Safari 5.1 to 6.0 */
+        background: -o-linear-gradient(#C2DFFF, white); /* For Opera 11.1 to 12.0 */
+        background: -moz-linear-gradient(#C2DFFF, white); /* For Firefox 3.6 to 15 */
+        background: linear-gradient(#C2DFFF, white); /* Standard syntax (must be last) */
+        border-radius: 25px;
+      }
+      div.gallery::after{
+        display: block;
+        content: '';
+        padding-top: 75%
+      }
+      div.gallery img {
+        display: block;
+        margin: 0 auto;
+        width: 25vw; 
+      }
+      .text {
+        padding: 25px;
+        text-align: center;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      .responsive {
+        padding: 6px;
+        float: left;
+        width: 49.99999%;;
+      }
+      @media only screen and (max-width: 1000px){
+        .responsive {
+          width: 49.99999%;
+          margin: 6px 0;
+        }
+      }
+      @media only screen and (max-width: 500px){
+        .responsive {
+          width: 100%;
+        }
+      }
+
+    </style>
+
+    <div>
+      <slot></slot>
+      <div class="responsive">
+        <div class="gallery">
+          <img id="image" alt: "IMAGE">
+          <div class="text">
+            <p>
+              <b>DESCRIPTION:</b>
+              <span id="description"></span>
+            </p>
+            <p>
+              <b>TAG:</b>
+              <span id="tag"></span>
+            </p>
+            <p>
+              <b>DATE:</b>
+              <span id="date"></span>
+            </p>
+          </div>
+        </div>
+      </div>  
+    </div>
+  </template>
+
+  <script>
+    class PictureFrame extends Polymer.Element {
+      static get is() { return "picture-frame"; }
+
+      setObject(obj){
+        //console.log(this.$.image);
+        this.$.image.src = obj.image;
+        //console.log(this.$.image.src);
+        this.$.description.innerHTML = obj.description;
+        this.$.tag.innerHTML = obj.tag;
+        this.$.date.innerHTML = obj.date;
+      }
+    }
+
+    customElements.define(PictureFrame.is, PictureFrame);
+  </script>
+
+</dom-module>
